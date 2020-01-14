@@ -77,8 +77,7 @@ class CFG(Module):
     |-----------+-------+-------------------------------------------------|
     | RF_SW     | 4     | Activates RF switch per channel                 |
     | LED       | 4     | Activates the red LED per channel               |
-    | PROFILE   | 3     | Controls DDS[0:3].PROFILE[0:2]                  |
-    | DUMMY     | 1     | Reserved (used in a previous revision)          |
+    | DRCTL     | 4     | Controls DRCTL per channel                      |
     | IO_UPDATE | 1     | Asserts DDS[0:3].IO_UPDATE where CFG.MASK_NU    |
     |           |       | is high                                         |
     | MASK_NU   | 4     | Disables DDS from QSPI interface, disables      |
@@ -99,10 +98,8 @@ class CFG(Module):
         self.data = Record([
             ("rf_sw", n),
             ("led", n),
+            ("drctl", n),
 
-            ("profile", 3),
-
-            ("dummy", 1),
             ("io_update", 1),
 
             ("mask_nu", 4),
@@ -140,7 +137,7 @@ class CFG(Module):
                     dds.led[0].eq(dds.rf_sw),  # green
                     dds.led[1].eq(self.data.led[i] | (self.en_9910 & (
                         dds.smp_err | ~dds.pll_lock))),  # red
-                    dds.profile.eq(self.data.profile),
+                    dds.drctl.eq(self.data.drctl[i]),
                     dds.osk.eq(1),
                     dds.drhold.eq(0),
                     dds.drctl.eq(0),

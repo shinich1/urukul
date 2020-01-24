@@ -76,8 +76,7 @@ class CFG(Module):
     |-----------+-------+-------------------------------------------------|
     | RF_SW     | 4     | Activates RF switch per channel                 |
     | LED       | 4     | Activates the red LED per channel               |
-    | PROFILE   | 3     | Controls DDS[0:3].PROFILE[0:2]                  |
-    | DUMMY     | 1     | Reserved (used in a previous revision)          |
+    | DRCTL     | 4     | Controls DRCTL per channel                      |
     | IO_UPDATE | 1     | Asserts DDS[0:3].IO_UPDATE where CFG.MASK_NU    |
     |           |       | is high                                         |
     | MASK_NU   | 4     | Disables DDS from QSPI interface, disables      |
@@ -98,10 +97,7 @@ class CFG(Module):
         self.data = Record([
             ("rf_sw", n),
             ("led", n),
-
-            ("profile", 3),
-
-            ("dummy", 1),
+            ("drctl", n),
             ("io_update", 1),
 
             ("mask_nu", 4),
@@ -121,7 +117,6 @@ class CFG(Module):
         self.en_9910 = Signal()
 
         self.comb += [
-                dds_common.profile.eq(self.data.profile),
                 clk.in_sel.eq(self.data.clk_sel0),
                 clk.mmcx_osc_sel.eq(self.data.clk_sel1),
                 clk.osc_en_n.eq(clk.in_sel | clk.mmcx_osc_sel),
@@ -131,16 +126,29 @@ class CFG(Module):
                 att.rst_n.eq(~self.data.rst),
         ]
 
+
+
         for i in range(n):
             sw = platform.request("eem", 12 + i)
             dds = platform.lookup_request("dds", i)
-            self.comb += [
-                    sw.oe.eq(0),
-                    dds.rf_sw.eq(sw.io | self.data.rf_sw[i]),
-                    dds.led[0].eq(dds.rf_sw),  # green
-                    dds.led[1].eq(self.data.led[i] | (self.en_9910 & (
-                        dds.smp_err | ~dds.pll_lock))),  # red
-            ]
+            if n != 0:
+                self.comb += [
+                        sw.oe.eq(0),
+                        dds.rf_sw.eq(sw.io | self.data.rf_sw[i]),
+                        #dds.led[0].eq(dds.rf_sw), 
+                        dds.led.eq(self.data.led[i] | (self.en_9910 & (
+                            dds.smp_err | ~dds.pll_lock))),  # red
+                        dds.drctl.eq(self.data.drctl[i]),
+                ]
+            else:
+                self.comb += [
+                        sw.oe.eq(0),
+                        dds.rf_sw.eq(sw.io | self.data.rf_sw[i]),
+                        dds.led[0].eq(dds.rf_sw),  # green
+                        dds.led[1].eq(self.data.led[i] | (self.en_9910 & (
+                            dds.smp_err | ~dds.pll_lock))),  # red
+                        dds.drctl.eq(self.data.drctl[i]),
+                ]
 
 
 class Status(Module):
@@ -170,7 +178,7 @@ class Status(Module):
             ("dummy", 1)
         ])
         self.comb += [
-                self.data.ifc_mode.eq(platform.lookup_request("ifc_mode")),
+                self.data.ifc_mode[0:2].eq(platform.lookup_request("ifc_mode")),
                 self.data.proto_rev.eq(__proto_rev__)
         ]
         for i in range(n):

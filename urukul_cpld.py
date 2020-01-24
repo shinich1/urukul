@@ -10,7 +10,7 @@ _io = [
         # ("tp", 4, Pins("P134")),  # osc_en_n
 
         # P112 is open on Urukul/v1.0
-        ("ifc_mode", 0, Pins("P104 P105 P110 P112")),
+        ("ifc_mode", 0, Pins("P104 P105 P110")),
 
         # P111 is IFC_MODE_SEL3 on Urukul/v1.0
         # 10k low: AD9912, 0R high: AD9910
@@ -37,7 +37,7 @@ _io = [
             Subsignal("master_reset", Pins("P102")),
             Subsignal("reset", Pins("P120")),
             Subsignal("io_reset", Pins("P129")),
-            Subsignal("profile", Pins("P130 P131 P132"))),
+            ),
 
         ("dds_sync", 0,
             Subsignal("clk0", Pins("P38"), Misc("PULLUP")),  # DDS_SYNC_CLK0
@@ -47,7 +47,8 @@ _io = [
 
         ("dds", 0,
             Subsignal("rf_sw", Pins("P103")),
-            Subsignal("led", Pins("P128 P126")),
+            Subsignal("led", Pins("P126")), #only 1 led
+            Subsignal("drctl", Pins("P132")),
             Subsignal("smp_err", Pins("P19"), Misc("PULLUP")),
             Subsignal("pll_lock", Pins("P21"), Misc("PULLUP")),
             Subsignal("io_update", Pins("P4")),
@@ -59,6 +60,7 @@ _io = [
         ("dds", 1,
             Subsignal("rf_sw", Pins("P101")),
             Subsignal("led", Pins("P118 P125")),
+            Subsignal("drctl", Pins("P131")),
             Subsignal("smp_err", Pins("P28"), Misc("PULLUP")),
             Subsignal("pll_lock", Pins("P35"), Misc("PULLUP")),
             Subsignal("io_update", Pins("P10")),
@@ -70,6 +72,7 @@ _io = [
         ("dds", 2,
             Subsignal("rf_sw", Pins("P100")),
             Subsignal("led", Pins("P116 P117")),
+            Subsignal("drctl", Pins("P128")),
             Subsignal("smp_err", Pins("P40"), Misc("PULLUP")),
             Subsignal("pll_lock", Pins("P41"), Misc("PULLUP")),
             Subsignal("io_update", Pins("P14")),
@@ -81,6 +84,7 @@ _io = [
         ("dds", 3,
             Subsignal("rf_sw", Pins("P98")),
             Subsignal("led", Pins("P121 P124")),
+            Subsignal("drctl", Pins("P112")),
             Subsignal("smp_err", Pins("P39"), Misc("PULLUP")),
             Subsignal("pll_lock", Pins("P49"), Misc("PULLUP")),
             Subsignal("io_update", Pins("P25")),

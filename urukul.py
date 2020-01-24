@@ -126,12 +126,10 @@ class CFG(Module):
                 att.rst_n.eq(~self.data.rst),
         ]
 
-
-
         for i in range(n):
             sw = platform.request("eem", 12 + i)
             dds = platform.lookup_request("dds", i)
-            if n != 0:
+            if i == 0:
                 self.comb += [
                         sw.oe.eq(0),
                         dds.rf_sw.eq(sw.io | self.data.rf_sw[i]),
